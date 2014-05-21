@@ -35,12 +35,14 @@ class Widgets_Content_Content extends Widgets_AbstractContent {
 
         $content = ($this->_container === null) ? '' : $this->_container->getContent();
         if (Tools_Security_Acl::isAllowed($this)) {
-            $content .= $this->_generateAdminControl(self::POPUP_WIDTH, self::POPUP_HEIGHT);
-            if ((bool)Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('inlineEditor')){
-                $content = '<div class="container-wrapper '. ($isPublished ? '' : 'unpublished') .'">' . $content . '</div>';
+            if ((bool)Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('inlineEditor') && !in_array('readonly',$this->_options)){
+                $content = '<div class="container-wrapper '. ($isPublished ? '' : 'unpublished') .'"><div class="content-editable">' . $content . '</div>'.$this->_generateAdminControl(self::POPUP_WIDTH, self::POPUP_HEIGHT).'</div>';
             }
             elseif(!$isPublished) {
-                $content = '<div class="unpublished">' . $content . '</div>';
+                $content = '<div class="unpublished">' . $content . $this->_generateAdminControl(self::POPUP_WIDTH, self::POPUP_HEIGHT) . '</div>';
+            }
+            else{
+                $content .= $this->_generateAdminControl(self::POPUP_WIDTH, self::POPUP_HEIGHT);
             }
         }
         else {

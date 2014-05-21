@@ -48,7 +48,13 @@
     $this->headScript()->setIndent(8)->setAllowArbitraryAttributes(true)
         ->prependFile($this->websiteUrl.'system/js/internal/system.min.js');
 
-	if (isset($this->minify) && $this->minify === true)  {
+    if((bool)Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('inlineEditor')){
+        $this->headScript()->setIndent(8)->setAllowArbitraryAttributes(true)
+            ->prependFile($this->websiteUrl.'system/js/internal/tinymceInitInline.js')
+            ->prependFile($this->websiteUrl.'system/js/external/tinymce/tinymce.min.js');
+    }
+
+    if (isset($this->minify) && $this->minify === true)  {
         echo Tools_System_Minify::minify($this->headScript(), true);
 	}
     else {
