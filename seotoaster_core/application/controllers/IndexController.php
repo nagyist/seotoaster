@@ -33,109 +33,133 @@ class IndexController extends Zend_Controller_Action {
 
 		// Loading page data using url from request. First checking cache, if no cache
 		// loading from the database and save result to the cache
-		$pageCacheKey = md5($pageUrl);
-        if(Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CACHE_PAGE)) {
-            $page = $this->_helper->cache->load($pageCacheKey, 'pagedata_');
+		$pageCacheKey  = md5($pageUrl);
+
+        // Enable full cache page
+        $fullCachePage = false;
+        if ($fullCachePage && null !== $fullCacheData = $this->_helper->cache->load($pageCacheKey, 'fullPageCache_')) {
+            $pageContent   = $fullCacheData['pageContent'];
+            $pageData      = $fullCacheData['pageData'];
+            $parserOptions = $fullCacheData['parserOptions'];
         }
+        else {
+            if(Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CACHE_PAGE)) {
+                $page = $this->_helper->cache->load($pageCacheKey, 'pagedata_');
+            }
 
-        // page is not in cache
-        if($page === null) {
-            $page = Application_Model_Mappers_PageMapper::getInstance()->findByUrl($pageUrl);
-        }
+            // page is not in cache
+            if($page === null) {
+                $page = Application_Model_Mappers_PageMapper::getInstance()->findByUrl($pageUrl);
+            }
 
-        // page found
-        if($page instanceof Application_Model_Models_Page) {
-            $cacheTag = preg_replace('/[^\w\d_]/', '', $page->getTemplateId());
-            $this->_helper->cache->save($pageCacheKey, $page, 'pagedata_', array($cacheTag, 'pageid_' . $page->getId()));
-            $tpl  =  Application_Model_Mappers_TemplateMapper::getInstance()->find($page->getTemplateId());
-            $this->view->tplType = $tpl->getType();
-        }
+            // page found
+            if($page instanceof Application_Model_Models_Page) {
+                $cacheTag = preg_replace('/[^\w\d_]/', '', $page->getTemplateId());
+                $this->_helper->cache->save($pageCacheKey, $page, 'pagedata_', array($cacheTag, 'pageid_' . $page->getId()));
+                $tpl  =  Application_Model_Mappers_TemplateMapper::getInstance()->find($page->getTemplateId());
+                $this->view->tplType = $tpl->getType();
+            }
 
-		// If page doesn't exists in the system - show 404 page
-		if($page === null) {
-			//show 404 page and exit
+            // If page doesn't exists in the system - show 404 page
+            if($page === null) {
+                //show 404 page and exit
 
-			$page = Application_Model_Mappers_PageMapper::getInstance()->find404Page();
+                $page = Application_Model_Mappers_PageMapper::getInstance()->find404Page();
 
-			if(!$page instanceof Application_Model_Models_Page) {
-				$this->view->websiteUrl = $this->_helper->website->getUrl();
-				$this->view->adminPanel = $this->_helper->admin->renderAdminPanel($this->_helper->session->getCurrentUser()->getRoleId());
-				$this->_helper->response->notFound($this->view->render('index/404page.phtml'));
-				exit;
-			}
+                if(!$page instanceof Application_Model_Models_Page) {
+                    $this->view->websiteUrl = $this->_helper->website->getUrl();
+                    $this->view->adminPanel = $this->_helper->admin->renderAdminPanel($this->_helper->session->getCurrentUser()->getRoleId());
+                    $this->_helper->response->notFound($this->view->render('index/404page.phtml'));
+                    exit;
+                }
 
-			$this->getResponse()->setHeader('HTTP/1.1', '404 Not Found');
-			$this->getResponse()->setHeader('Status', '404 File not found');
+                $this->getResponse()->setHeader('HTTP/1.1', '404 Not Found');
+                $this->getResponse()->setHeader('Status', '404 File not found');
 
-		}
+            }
 
-        //if requested page is not allowed - redirect to the signup landing page
-        if (!Tools_Security_Acl::isAllowed($page)) {
-            $signupLanding = Tools_Page_Tools::getLandingPage(Application_Model_Models_Page::OPT_SIGNUPLAND);
-            $this->_helper->redirector->gotoUrl(($signupLanding instanceof Application_Model_Models_Page) ? $this->_helper->website->getUrl() . $signupLanding->getUrl() : $this->_helper->website->getUrl());
-        }
+            //if requested page is not allowed - redirect to the signup landing page
+            if (!Tools_Security_Acl::isAllowed($page)) {
+                $signupLanding = Tools_Page_Tools::getLandingPage(Application_Model_Models_Page::OPT_SIGNUPLAND);
+                $this->_helper->redirector->gotoUrl(($signupLanding instanceof Application_Model_Models_Page) ? $this->_helper->website->getUrl() . $signupLanding->getUrl() : $this->_helper->website->getUrl());
+            }
 
-        // Mobile switch
-        if ((bool) $this->_config->getConfig('enableMobileTemplates')) {
-            if ($this->_request->isGet() && $this->_request->has('mobileSwitch')) {
-                $showMobile = filter_var($this->_request->getParam('mobileSwitch'), FILTER_SANITIZE_NUMBER_INT);
-                if (!is_null($showMobile)) {
-                    // save mobileSwitch in session
-                    $this->_helper->session->mobileSwitch = (bool) $showMobile;
-                    // redirect to target page
-                    $this->redirect($this->_helper->website->getUrl().$page->getUrl());
+            // Mobile switch
+            if ((bool) $this->_config->getConfig('enableMobileTemplates')) {
+                if ($this->_request->isGet() && $this->_request->has('mobileSwitch')) {
+                    $showMobile = filter_var($this->_request->getParam('mobileSwitch'), FILTER_SANITIZE_NUMBER_INT);
+                    if (!is_null($showMobile)) {
+                        // save mobileSwitch in session
+                        $this->_helper->session->mobileSwitch = (bool) $showMobile;
+                        // redirect to target page
+                        $this->redirect($this->_helper->website->getUrl().$page->getUrl());
+                    }
+                }
+
+                if (!isset($showMobile) && isset($this->_helper->session->mobileSwitch)) {
+                    $showMobile = $this->_helper->session->mobileSwitch;
+                } else {
+                    $showMobile = $this->_helper->mobile->isMobile();
+                }
+
+                // Mobile detect
+                if ($showMobile === true) {
+                    $mobileTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->find('mobile_'.$page->getTemplateId());
+                    if (null !== ($mobileTemplate)) {
+                        $page->setTemplateId($mobileTemplate->getName())->setContent($mobileTemplate->getContent());
+                    }
+                    unset($mobileTemplate);
                 }
             }
 
-            if (!isset($showMobile) && isset($this->_helper->session->mobileSwitch)) {
-                $showMobile = $this->_helper->session->mobileSwitch;
-            } else {
-                $showMobile = $this->_helper->mobile->isMobile();
-            }
+            $pageData = $page->toArray();
 
-            // Mobile detect
-            if ($showMobile === true) {
-                $mobileTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->find('mobile_'.$page->getTemplateId());
-                if (null !== ($mobileTemplate)) {
-                    $page->setTemplateId($mobileTemplate->getName())->setContent($mobileTemplate->getContent());
+            // Parsing page content and saving it to the cache
+            if ($pageContent === null) {
+                $themeData     = Zend_Registry::get('theme');
+                $websitePath   = $this->_helper->website->getPath();
+                $currentTheme  = $this->_config->getConfig('currentTheme');
+                $parserOptions = array(
+                    'websiteUrl'   => $this->_helper->website->getUrl(),
+                    'websitePath'  => $websitePath,
+                    'currentTheme' => $currentTheme,
+                    'themePath'    => $themeData['path'],
+                );
+
+                // if developerMode = 1, parsing template directly from files
+                if ((bool) $this->_config->getConfig('enableDeveloperMode')) {
+                    $filePath = $websitePath.$themeData['path'].$currentTheme.DIRECTORY_SEPARATOR.$page->getTemplateId()
+                        .'.html';
+                    if (file_exists($filePath)) {
+                        $page->setContent(Tools_Filesystem_Tools::getFile($filePath));
+                    }
                 }
-                unset($mobileTemplate);
+
+                $parser      = new Tools_Content_Parser($page->getContent(), $pageData, $parserOptions);
+                $pageContent = $parser->parse();
+
+                unset($parser, $themeData);
             }
-        }
 
-        $pageData = $page->toArray();
+            $pageContent   = $this->_pageRunkSculptingDemand($page, $pageContent);
 
-        // Parsing page content and saving it to the cache
-        if ($pageContent === null) {
-            $themeData     = Zend_Registry::get('theme');
-            $websitePath   = $this->_helper->website->getPath();
-            $currentTheme  = $this->_config->getConfig('currentTheme');
-            $parserOptions = array(
-                'websiteUrl'   => $this->_helper->website->getUrl(),
-                'websitePath'  => $websitePath,
-                'currentTheme' => $currentTheme,
-                'themePath'    => $themeData['path'],
+            // Save full page cache
+            $fullCachePage = array(
+                'pageData'      => $pageData,
+                'pageContent'   => $pageContent,
+                'parserOptions' => $parserOptions
             );
-
-            // if developerMode = 1, parsing template directly from files
-            if ((bool) $this->_config->getConfig('enableDeveloperMode')) {
-                $filePath = $websitePath.$themeData['path'].$currentTheme.DIRECTORY_SEPARATOR.$page->getTemplateId()
-                    .'.html';
-                if (file_exists($filePath)) {
-                    $page->setContent(Tools_Filesystem_Tools::getFile($filePath));
-                }
-            }
-
-            $parser      = new Tools_Content_Parser($page->getContent(), $pageData, $parserOptions);
-            $pageContent = $parser->parse();
-
-            unset($parser, $themeData);
+            $this->_helper->cache->save(
+                $pageCacheKey,
+                $fullCachePage,
+                'fullPageCache_',
+                array('pageid_'.$page->getId())
+            );
+            unset($fullCachePage);
         }
 
-    	$pageContent = $this->_pageRunkSculptingDemand($page, $pageContent);
-
-		// Finalize page generation routine
-		$this->_complete($pageContent, $pageData, $parserOptions);
+        // Finalize page generation routine
+        $this->_complete($pageContent, $pageData, $parserOptions);
 	}
 
 
