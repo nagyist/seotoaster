@@ -38,7 +38,9 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'remote_authorization_info'  => $user->getRemoteAuthorizationInfo(),
             'remote_authorization_token' => $user->getRemoteAuthorizationToken(),
             'personal_calendar_url'      => $user->getPersonalCalendarUrl(),
-            'avatar_link'                => $user->getAvatarLink()
+            'avatar_link'                => $user->getAvatarLink(),
+            'receive_reports'            => $user->getReceiveReports(),
+            'receive_reports_preferable_time' => $user->getReceiveReportsPreferableTime(),
 		);
 		if(!$user->getPassword()) {
 			unset($data['password']);
@@ -132,6 +134,8 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'u.remote_authorization_token',
             'u.personal_calendar_url',
             'u.avatar_link',
+            'u.receive_reports',
+            'u.receive_reports_preferable_time',
         );
 
         $select = $this->getDbTable()->getAdapter()->select()
