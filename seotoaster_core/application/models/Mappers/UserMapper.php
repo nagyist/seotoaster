@@ -41,6 +41,8 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'avatar_link'                => $user->getAvatarLink(),
             'receive_reports'            => $user->getReceiveReports(),
             'receive_reports_preferable_time' => $user->getReceiveReportsPreferableTime(),
+            'receive_reports_cc_email'   => $user->getReceiveReportsCcEmail(),
+            'receive_reports_types_list' => $user->getReceiveReportsTypesList(),
 		);
 		if(!$user->getPassword()) {
 			unset($data['password']);
@@ -136,6 +138,8 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'u.avatar_link',
             'u.receive_reports',
             'u.receive_reports_preferable_time',
+            'u.receive_reports_cc_email',
+            'u.receive_reports_types_list',
         );
 
         $select = $this->getDbTable()->getAdapter()->select()

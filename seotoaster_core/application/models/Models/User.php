@@ -60,6 +60,10 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
 
     protected $_receiveReportsPreferableTime = '0';
 
+    protected $_receiveReportsCcEmail = '';
+
+    protected $_receiveReportsTypesList = '';
+
     public function setGplusProfile($gplusProfile) {
         $this->_gplusProfile = $gplusProfile;
         return $this;
@@ -544,6 +548,39 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
     {
         $this->_receiveReportsPreferableTime = $receiveReportsPreferableTime;
     }
+
+    /**
+     * @return string
+     */
+    public function getReceiveReportsCcEmail()
+    {
+        return $this->_receiveReportsCcEmail;
+    }
+
+    /**
+     * @param string $receiveReportsCcEmail
+     */
+    public function setReceiveReportsCcEmail($receiveReportsCcEmail)
+    {
+        $this->_receiveReportsCcEmail = $receiveReportsCcEmail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReceiveReportsTypesList()
+    {
+        return $this->_receiveReportsTypesList;
+    }
+
+    /**
+     * @param string $receiveReportsTypesList
+     */
+    public function setReceiveReportsTypesList($receiveReportsTypesList)
+    {
+        $this->_receiveReportsTypesList = $receiveReportsTypesList;
+    }
+
 
 
 

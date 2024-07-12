@@ -460,6 +460,8 @@ CREATE TABLE `user` (
   `avatar_link` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   `receive_reports` ENUM('0', '1') DEFAULT '0',
   `receive_reports_preferable_time` int(10) unsigned DEFAULT NULL,
+  `receive_reports_cc_email` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
+  `receive_reports_types_list` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `indEmail` (`email`),
   KEY `indPassword` (`password`)

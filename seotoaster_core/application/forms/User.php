@@ -47,6 +47,10 @@ class Application_Form_User extends Application_Form_Secure {
 
     protected $_receiveReportsPreferableTime = '';
 
+    protected $_receiveReportsCcEmail = '';
+
+    protected $_receiveReportsTypesList = '';
+
 	public function init() {
         parent::init();
 
@@ -519,6 +523,30 @@ class Application_Form_User extends Application_Form_Secure {
     {
         $this->_receiveReportsPreferableTime = $receiveReportsPreferableTime;
         $this->getElement('receiveReportsPreferableTime')->setValue($receiveReportsPreferableTime);
+        return $this;
+    }
+
+    public function getReceiveReportsCcEmail()
+    {
+        return $this->_receiveReportsCcEmail;
+    }
+
+    public function setReceiveReportsCcEmail($receiveReportsCcEmail)
+    {
+        $this->_receiveReportsCcEmail = $receiveReportsCcEmail;
+        $this->getElement('receiveReportsCcEmail')->setValue($receiveReportsCcEmail);
+        return $this;
+    }
+
+    public function getReceiveReportsTypesList()
+    {
+        return $this->_receiveReportsTypesList;
+    }
+
+    public function setReceiveReportsTypesList($receiveReportsTypesList)
+    {
+        $this->_receiveReportsCcEmail = $receiveReportsTypesList;
+        $this->getElement('receiveReportsTypesList')->setValue($receiveReportsTypesList);
         return $this;
     }
 
