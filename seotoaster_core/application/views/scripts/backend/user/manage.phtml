@@ -129,6 +129,15 @@
                         <?php endforeach;?>
                     </select>
                 </p>
+                <p class="grid_6 alpha">
+                    <label class="grid_10"><?php echo $this->translate('Activate 2FA');?> (<?php echo $this->translate('Admin and sales persons roles only');?>)
+                        <input data-default-attr="activateMfa" <?php echo (!empty($this->activateMfa) ? 'checked':'');?> class="grid_2" id="enable-mfa" type="checkbox" name="enable-mfa" />
+                    </label>
+                </p>
+                <p class="grid_6 alpha">
+
+                </p>
+                <hr/>
             </div>
             <form class="grid_10 alpha search" name="search" action="<?php echo $this->websiteUrl; ?>backend/backend_user/manage/by/last_login/order/<?php echo $this->order; ?>" method="get">
                 <div class="grid_3 alpha">
@@ -463,6 +472,17 @@
                     $('#user-desktop-phone').mask('(999) 999 9999', {autoclear: false});
                 }
             }
+        });
+
+        $(document).on('change', '#enable-mfa', function(){
+            var defaultAttrValue = 0,
+                defaultAttrName = $(this).data('default-attr');
+
+            if ($(this).is(':checked')) {
+                defaultAttrValue = 1;
+            }
+
+            saveDefaultParam(defaultAttrName, defaultAttrValue);
         });
 	});
 

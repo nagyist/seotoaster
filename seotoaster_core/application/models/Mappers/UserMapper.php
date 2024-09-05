@@ -43,6 +43,9 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'receive_reports_preferable_time' => $user->getReceiveReportsPreferableTime(),
             'receive_reports_cc_email'   => $user->getReceiveReportsCcEmail(),
             'receive_reports_types_list' => $user->getReceiveReportsTypesList(),
+            'enabled_mfa'                => $user->getEnabledMfa(),
+            'mfa_code'                   => $user->getMfaCode(),
+            'mfa_code_expiration_time'   => $user->getMfaCodeExpirationTime(),
 		);
 		if(!$user->getPassword()) {
 			unset($data['password']);
@@ -140,6 +143,9 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'u.receive_reports_preferable_time',
             'u.receive_reports_cc_email',
             'u.receive_reports_types_list',
+            'u.enabled_mfa',
+            'u.mfa_code',
+            'u.mfa_code_expiration_time',
         );
 
         $select = $this->getDbTable()->getAdapter()->select()

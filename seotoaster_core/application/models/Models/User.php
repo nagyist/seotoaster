@@ -64,6 +64,12 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
 
     protected $_receiveReportsTypesList = '';
 
+    protected $_enabledMfa = '0';
+
+    protected $_mfaCode = '';
+
+    protected $_mfaCodeExpirationTime = '';
+
     public function setGplusProfile($gplusProfile) {
         $this->_gplusProfile = $gplusProfile;
         return $this;
@@ -581,9 +587,53 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
         $this->_receiveReportsTypesList = $receiveReportsTypesList;
     }
 
+    /**
+     * @return string
+     */
+    public function getEnabledMfa()
+    {
+        return $this->_enabledMfa;
+    }
 
+    /**
+     * @param string $enabledMfa
+     */
+    public function setEnabledMfa($enabledMfa)
+    {
+        $this->_enabledMfa = $enabledMfa;
+    }
 
+    /**
+     * @return string
+     */
+    public function getMfaCode()
+    {
+        return $this->_mfaCode;
+    }
 
+    /**
+     * @param string $mfaCode
+     */
+    public function setMfaCode($mfaCode)
+    {
+        $this->_mfaCode = $mfaCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMfaCodeExpirationTime()
+    {
+        return $this->_mfaCodeExpirationTime;
+    }
+
+    /**
+     * @param string $mfaCodeExpirationTime
+     */
+    public function setMfaCodeExpirationTime($mfaCodeExpirationTime)
+    {
+        $this->_mfaCodeExpirationTime = $mfaCodeExpirationTime;
+    }
 
 }
 
