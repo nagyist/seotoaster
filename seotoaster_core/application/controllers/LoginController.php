@@ -24,6 +24,66 @@ class LoginController extends Zend_Controller_Action {
 				$this->_checkRedirect(false, array());
 			}
 			$loginForm->removeElement(Tools_System_Tools::CSRF_SECURE_TOKEN);
+
+			//code verification part start section
+			if (isset($this->_helper->session->verificationCodeUserId)) {
+                $loginVerificationCode = $this->_request->getParam('login-verification-code', FILTER_SANITIZE_NUMBER_INT);
+                $isVerificationCodeValid = Tools_System_MfaTools::isVerificationCodeValid($this->_helper->session->verificationCodeUserId, $loginVerificationCode);
+                if ($isVerificationCodeValid === false) {
+                    $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Please enter valid verification code')));
+                }
+
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $userModel = $userMapper->find($this->_helper->session->verificationCodeUserId);
+                if (!$userModel instanceof Application_Model_Models_User) {
+                    $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('User not found')));
+                }
+
+                $userModel->setPassword('');
+                $userModel->setLastLogin(date(Tools_System_Tools::DATE_MYSQL));
+                $userModel->setIpaddress($_SERVER['REMOTE_ADDR']);
+                $this->_helper->session->setCurrentUser($userModel);
+                $userMapper->save($userModel);
+                Zend_Session::regenerateId();
+                $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                $cacheHelper->clean();
+                unset($this->_helper->session->verificationCodeUserId);
+                unset($this->_helper->session->verificationCodeUserIdExpiresAt);
+
+                if($userModel->getRoleId() == Tools_Security_Acl::ROLE_MEMBER) {
+                    $this->_memberRedirect();
+                }
+
+                if($userModel->getRoleId() == Tools_Security_Acl::ROLE_SUPERADMIN) {
+                    $superAdminRedirectPageModel = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption('option_adminredirect', true);
+                    if ($superAdminRedirectPageModel instanceof Application_Model_Models_Page) {
+                        $this->_redirect($this->_helper->website->getUrl() . $superAdminRedirectPageModel->getUrl(), array('exit' => true));
+                    }
+                }
+
+                if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS, $userModel->getRoleId())) {
+                    $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+                    $redirectAdminAfterLogin = $configHelper->getConfig('redirectAdminAfterLogin');
+
+                    if (!empty($redirectAdminAfterLogin)) {
+                        $redirector = new Zend_Controller_Action_Helper_Redirector();
+                        $redirector->gotoUrl($this->_helper->website->getUrl().$redirectAdminAfterLogin);
+                    }
+                }
+                //code verification part end section
+
+
+                if(isset($this->_helper->session->redirectUserTo)) {
+                    $this->_redirect($this->_helper->website->getUrl() . $this->_helper->session->redirectUserTo, array('exit' => true));
+                }
+                if (isset($this->_helper->session->loginCustomRedirect)) {
+                    $customRedirect = $this->_helper->session->loginCustomRedirect;
+                    unset($this->_helper->session->loginCustomRedirect);
+                    $this->redirect($customRedirect, array('exit' => true));
+                }
+                $this->_redirect((isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : $this->_helper->website->getUrl());
+			}
+
 			if($loginForm->isValid($this->getRequest()->getParams())) {
 				$authAdapter = new Zend_Auth_Adapter_DbTable(
 					Zend_Registry::get('dbAdapter'),
@@ -50,6 +110,28 @@ class LoginController extends Zend_Controller_Action {
                                     $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Access not allowed')));
                                 }
                             }
+                        }
+
+                        $userModel = Application_Model_Mappers_UserMapper::getInstance()->findByEmail($loginForm->getValue('email'));
+                        if (!$userModel instanceof Application_Model_Models_User) {
+                            $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('There is no user with such login and password.')));
+                        }
+
+                        $userId = $userModel->getId();
+                        if (Tools_System_MfaTools::isUserEligibleForMfa($userId) === true) {
+                            $mfaResponse = Tools_System_MfaTools::sendMfaNotification($userId);
+                            if (empty($mfaResponse)) {
+                                $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Please contact website administrator')));
+                            }
+
+                            if (!empty($mfaResponse['error'])) {
+                                $this->_checkRedirect(false, array('email' => $mfaResponse['message']));
+                            }
+
+                            $this->_helper->session->verificationCodeUserId = $userId;
+                            $this->_helper->session->verificationCodeUserIdExpiresAt = Tools_System_Tools::convertDateFromTimezone('+10 minutes', 'UTC', 'UTC');
+
+                            $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Verification code was sent on your email. Please enter your verification code below')));
                         }
 
 						$user = new Application_Model_Models_User((array)$authUserData);
@@ -119,7 +201,19 @@ class LoginController extends Zend_Controller_Action {
                     }
                 }
             }
-			$this->view->messages   = $this->_helper->flashMessenger->getMessages();
+
+            Tools_System_MfaTools::cleanVerificationUserId();
+            $verificationCodeSection = false;
+            if (isset($this->_helper->session->verificationCodeUserId)) {
+                $verificationCodeSection = true;
+                if (empty($errorMessages)) {
+                    $errorMessages[] = array('email' => $this->_helper->language->translate('Verification code was sent on your email. Please enter your verification code below'));
+                }
+            }
+
+            $this->view->verificationCodeSection = $verificationCodeSection;
+
+			$this->view->messages   = $errorMessages;
 			//unset url redirect set from any login widget
 			unset($this->_helper->session->redirectUserTo);
             $loginForm->removeDecorator('HtmlTag');

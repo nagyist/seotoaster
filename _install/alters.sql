@@ -863,6 +863,7 @@ ALTER TABLE `user` ADD `receive_reports_types_list` TEXT COLLATE utf8_unicode_ci
 ALTER TABLE `user` ADD `enabled_mfa` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `user` ADD `mfa_code` CHAR(6) DEFAULT NULL;
 ALTER TABLE `user` ADD `mfa_code_expiration_time` TIMESTAMP NULL;
+INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES ('1',	't_mfanotification',	'Tools_Mail_SystemMailWatchdog');
 
 -- These alters are always the latest and updated version of the database
 UPDATE `config` SET `value`='3.8.2' WHERE `name`='version';

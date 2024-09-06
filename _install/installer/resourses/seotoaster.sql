@@ -97,7 +97,8 @@ INSERT INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`) VALUE
 (3,	'1',	't_passwordchange',	'Tools_Mail_SystemMailWatchdog'),
 (4,	'1',	't_membersignup',	'Tools_Mail_SystemMailWatchdog'),
 (5,	'1',	't_systemnotification',	'Tools_Mail_SystemMailWatchdog'),
-(6,	'1',	't_userinvitation',	'Tools_Mail_SystemMailWatchdog');
+(6,	'1',	't_userinvitation',	'Tools_Mail_SystemMailWatchdog'),
+(6,	'1',	't_mfanotification', 'Tools_Mail_SystemMailWatchdog');
 
 DROP TABLE IF EXISTS `email_triggers_actions`;
 CREATE TABLE `email_triggers_actions` (

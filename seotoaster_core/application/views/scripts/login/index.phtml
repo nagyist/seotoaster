@@ -30,7 +30,12 @@
         </div>
 
         <?php if (!empty(($this->messages)) && is_array($this->messages)) : ?>
-            <div class="card-messages error">
+            <?php $messageClass = 'error';?>
+            <?php if ($this->verificationCodeSection):?>
+                <?php $messageClass = 'error';?>
+            <?php endif;?>
+
+            <div class="card-messages <?php echo $messageClass;?>">
                 <ul id="messages" class="list-unstyled">
                     <?php $this->messages = array_pop($this->messages);?>
                     <?php foreach ($this->messages as $message) : ?>
@@ -41,18 +46,25 @@
         <?php endif; ?>
 
         <div class="card-content">
-            <div class="field-line"><?php
-                echo $this->loginForm->getElement('email')->renderLabel();
-                echo $this->loginForm->getElement('email')->renderViewHelper();
-                ?>
-            </div>
-            <div class="field-line">
-                <?php echo $this->loginForm->getElement('password')->renderLabel(); ?>
-                <div class="sneak-peek-eye">
-                    <?php echo $this->loginForm->getElement('password')->renderViewHelper(); ?>
-                    <span class="sneak-peek"></span>
+            <?php if ($this->verificationCodeSection === false):?>
+                <div class="field-line"><?php
+                    echo $this->loginForm->getElement('email')->renderLabel();
+                    echo $this->loginForm->getElement('email')->renderViewHelper();
+                    ?>
                 </div>
-            </div>
+                <div class="field-line">
+                    <?php echo $this->loginForm->getElement('password')->renderLabel(); ?>
+                    <div class="sneak-peek-eye">
+                        <?php echo $this->loginForm->getElement('password')->renderViewHelper(); ?>
+                        <span class="sneak-peek"></span>
+                    </div>
+                </div>
+            <?php else:?>
+                <div class="field-line">
+                    <label for="login-verification-code" class="required"><?php echo $this->translate('Verification code'); ?></label>
+                    <input id="login-verification-code" type="text" name="login-verification-code" value="">
+                </div>
+            <?php endif;?>
         </div>
 
         <div class="btn-area">
