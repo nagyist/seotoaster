@@ -61,8 +61,11 @@
                 </div>
             <?php else:?>
                 <div class="field-line">
-                    <label for="login-verification-code" class="required"><?php echo $this->translate('Verification code'); ?></label>
+                    <label for="login-verification-code" class="required"><?php echo $this->translate('Enter the verification code'); ?></label>
                     <input id="login-verification-code" type="text" name="login-verification-code" value="">
+                </div>
+                <div class="field-line">
+                    <span><?php echo $this->translate('Didn\'t receive a code?'); ?></span> <a id="resend-verification-code-link" href="javascript:;"><?php echo $this->translate('Resend'); ?></a>
                 </div>
             <?php endif;?>
         </div>
@@ -71,7 +74,7 @@
             <a id="forgot-password" href="<?php echo $this->websiteUrl; ?>login/retrieve/"><?php echo $this->translate('Forgot password?'); ?></a>
             <?php echo $this->loginForm->getElement('submit')->renderViewHelper();?>
         </div>
-        <input type="hidden" name="secureToken" value="<?php echo $this->secureToken;?>"/>
+        <input id="secure-token" type="hidden" name="secureToken" value="<?php echo $this->secureToken;?>"/>
     </form>
 
 </main>
@@ -87,6 +90,28 @@
     $('.notvalid').on('keyup', function(){
         $(this).removeClass('notvalid');
         $(this).unbind();
+    });
+    $(document).on('click', '#resend-verification-code-link', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url:'<?php echo $this->websiteUrl;?>api/toaster/loginverificationcode/',
+            type:"POST",
+            dataType:"json",
+            data:{
+                'secureToken':$('#secure-token').val()
+            }
+        }).done(function(response) {
+            if (parseInt(response.error) === 0) {
+                showMessage(response.message, false, 2000);
+            } else {
+                showMessage(response.message, true, 3000);
+                setTimeout(function() {
+                    window.location.reload();
+                }, 3000);
+            }
+        });
+
     });
 <?php $this->jQuery()->onLoadCaptureEnd(); ?>
 </script>

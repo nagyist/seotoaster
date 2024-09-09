@@ -131,7 +131,7 @@ class LoginController extends Zend_Controller_Action {
                             $this->_helper->session->verificationCodeUserId = $userId;
                             $this->_helper->session->verificationCodeUserIdExpiresAt = Tools_System_Tools::convertDateFromTimezone('+10 minutes', 'UTC', 'UTC');
 
-                            $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Verification code was sent on your email. Please enter your verification code below')));
+                            $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Verification code was sent on your email.')));
                         }
 
 						$user = new Application_Model_Models_User((array)$authUserData);
@@ -207,7 +207,7 @@ class LoginController extends Zend_Controller_Action {
             if (isset($this->_helper->session->verificationCodeUserId)) {
                 $verificationCodeSection = true;
                 if (empty($errorMessages)) {
-                    $errorMessages[] = array('email' => $this->_helper->language->translate('Verification code was sent on your email. Please enter your verification code below'));
+                    $errorMessages[] = array('email' => $this->_helper->language->translate('Verification code was sent on your email.'));
                 }
             }
 
