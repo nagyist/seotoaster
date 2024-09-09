@@ -119,6 +119,11 @@ class LoginController extends Zend_Controller_Action {
 
                         $userId = $userModel->getId();
                         if (Tools_System_MfaTools::isUserEligibleForMfa($userId) === true) {
+                            $signInType = $this->getRequest()->getParam('singintype');
+                            if (!empty($signInType) && $signInType == Tools_Security_Acl::ROLE_MEMBER) {
+                                $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Use'). ' <a target="_blank" href="'.$this->_helper->website->getUrl().'go"'.'>'.$this->_helper->website->getUrl().'go</a> ' .$this->_helper->language->translate('to be able to login into the website.')));
+                            }
+
                             $mfaResponse = Tools_System_MfaTools::sendMfaNotification($userId);
                             if (empty($mfaResponse)) {
                                 $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Please contact website administrator')));

@@ -88,6 +88,9 @@ class Backend_UserController extends Zend_Controller_Action {
                         $data['receiveReportsPreferableTime'] = $existedUser->getReceiveReportsPreferableTime();
                         $data['receiveReportsCcEmail'] = $existedUser->getReceiveReportsCcEmail();
                         $data['receiveReportsTypesList'] = $existedUser->getReceiveReportsTypesList();
+                        $data['enabledMfa'] = $existedUser->getEnabledMfa();
+                        $data['mfaCode'] = $existedUser->getMfaCode();
+                        $data['mfaCodeExpirationTime'] = $existedUser->getMfaCodeExpirationTime();
                     }
                 } else {
                     $notifyNewUser = true;
