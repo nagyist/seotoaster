@@ -136,6 +136,12 @@ class Tools_System_MfaTools
             return false;
         }
 
+        $mfaCodeExpirationTime = $userModel->getMfaCodeExpirationTime();
+
+        if (strtotime(Tools_System_Tools::convertDateFromTimezone('now', 'UTC', 'UTC')) > strtotime($mfaCodeExpirationTime)) {
+            return false;
+        }
+
         return true;
 
     }
