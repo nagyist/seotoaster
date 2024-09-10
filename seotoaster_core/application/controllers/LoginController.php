@@ -30,7 +30,12 @@ class LoginController extends Zend_Controller_Action {
                 $loginVerificationCode = $this->_request->getParam('login-verification-code', FILTER_SANITIZE_NUMBER_INT);
                 $isVerificationCodeValid = Tools_System_MfaTools::isVerificationCodeValid($this->_helper->session->verificationCodeUserId, $loginVerificationCode);
                 if ($isVerificationCodeValid === false) {
-                    $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Please enter valid verification code')));
+                    Tools_System_MfaTools::cleanVerificationUserId();
+                    if (!isset($this->_helper->session->verificationCodeUserId)) {
+                        $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Verification code has been expired. Please re-login.')));
+                    } else {
+                        $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Please enter valid verification code')));
+                    }
                 }
 
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
