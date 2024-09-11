@@ -40,7 +40,7 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('optimizedNotifications', ''),
 ('wraplinks', '0'),
 ('takeATour', '1'),
-('version',	'3.8.1');
+('version',	'3.8.2');
 
 
 DROP TABLE IF EXISTS `container`;
@@ -462,6 +462,7 @@ CREATE TABLE `user` (
   `receive_reports_preferable_time` int(10) unsigned DEFAULT NULL,
   `receive_reports_cc_email` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   `receive_reports_types_list` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
+  `exclude_weekends` ENUM('0', '1') DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `indEmail` (`email`),
   KEY `indPassword` (`password`)

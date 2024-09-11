@@ -849,7 +849,7 @@ CREATE TABLE `user_whitelist_ips` (
 -- version: 3.7.1
 -- Pre package version
 
--- 10.07.2014
+-- 10.07.2024
 -- Add send receive reports flag
 -- version: 3.8.0
 ALTER TABLE `user` ADD `receive_reports` ENUM('0', '1') DEFAULT '0';
@@ -857,6 +857,11 @@ ALTER TABLE `user` ADD `receive_reports_preferable_time` int(10) unsigned DEFAUL
 ALTER TABLE `user` ADD `receive_reports_cc_email` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `user` ADD `receive_reports_types_list` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 
+-- 03.09.2024
+-- Add exclude weekends
+-- version: 3.8.1
+ALTER TABLE `user` ADD COLUMN `exclude_weekends` ENUM('0', '1') DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `config` SET `value`='3.8.1' WHERE `name`='version';
+UPDATE `config` SET `value`='3.8.2' WHERE `name`='version';
 SELECT value FROM `config` WHERE name = 'version';

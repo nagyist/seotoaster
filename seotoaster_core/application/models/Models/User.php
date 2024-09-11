@@ -64,6 +64,8 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
 
     protected $_receiveReportsTypesList = '';
 
+    protected $_excludeWeekends = '0';
+
     public function setGplusProfile($gplusProfile) {
         $this->_gplusProfile = $gplusProfile;
         return $this;
@@ -581,7 +583,21 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
         $this->_receiveReportsTypesList = $receiveReportsTypesList;
     }
 
+    /**
+     * @return string
+     */
+    public function getExcludeWeekends()
+    {
+        return $this->_excludeWeekends;
+    }
 
+    /**
+     * @param string $excludeWeekends
+     */
+    public function setExcludeWeekends($excludeWeekends)
+    {
+        $this->_excludeWeekends = $excludeWeekends;
+    }
 
 
 

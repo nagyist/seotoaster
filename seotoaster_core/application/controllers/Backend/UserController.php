@@ -88,6 +88,7 @@ class Backend_UserController extends Zend_Controller_Action {
                         $data['receiveReportsPreferableTime'] = $existedUser->getReceiveReportsPreferableTime();
                         $data['receiveReportsCcEmail'] = $existedUser->getReceiveReportsCcEmail();
                         $data['receiveReportsTypesList'] = $existedUser->getReceiveReportsTypesList();
+                        $data['excludeWeekends'] = $existedUser->getExcludeWeekends();
                     }
                 } else {
                     $notifyNewUser = true;
