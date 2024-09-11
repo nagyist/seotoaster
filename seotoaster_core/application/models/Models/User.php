@@ -70,6 +70,8 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
 
     protected $_mfaCodeExpirationTime = '';
 
+    protected $_excludeWeekends = '0';
+
     public function setGplusProfile($gplusProfile) {
         $this->_gplusProfile = $gplusProfile;
         return $this;
@@ -617,6 +619,20 @@ class Application_Model_Models_User extends Application_Model_Models_Abstract im
     public function setMfaCode($mfaCode)
     {
         $this->_mfaCode = $mfaCode;
+    }
+
+    public function getExcludeWeekends()
+    {
+        return $this->_excludeWeekends;
+    }
+
+    /**
+     * @param string $excludeWeekends
+     */
+    public function setExcludeWeekends($excludeWeekends)
+    {
+        $this->_excludeWeekends = $excludeWeekends;
+
     }
 
     /**

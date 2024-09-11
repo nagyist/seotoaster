@@ -46,6 +46,7 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'enabled_mfa'                => $user->getEnabledMfa(),
             'mfa_code'                   => $user->getMfaCode(),
             'mfa_code_expiration_time'   => $user->getMfaCodeExpirationTime(),
+            'exclude_weekends'           => $user->getExcludeWeekends(),
 		);
 		if(!$user->getPassword()) {
 			unset($data['password']);
@@ -146,6 +147,7 @@ class Application_Model_Mappers_UserMapper extends Application_Model_Mappers_Abs
             'u.enabled_mfa',
             'u.mfa_code',
             'u.mfa_code_expiration_time',
+            'u.exclude_weekends',
         );
 
         $select = $this->getDbTable()->getAdapter()->select()
