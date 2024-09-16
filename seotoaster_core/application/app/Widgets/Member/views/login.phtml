@@ -11,11 +11,12 @@
         </ul>
     <?php endif; ?>
     <?php
-    $this->loginForm->setAction($this->websiteUrl . 'backend/login/index/singintype/member/');
-    $this->loginForm->getElement('secureToken')->setValue($this->secureToken);
-    echo $this->loginForm;
-    if ($this->mfaEnabled === true) {
-
+    if ($this->mfaEnabled === true && $this->verificationCodeSection === true) {
+        
+    } else {
+        $this->loginForm->setAction($this->websiteUrl . 'backend/login/index/singintype/member/');
+        $this->loginForm->getElement('secureToken')->setValue($this->secureToken);
+        echo $this->loginForm;
     }
     ?>
     <a href="javascript:;" title="<?php echo $this->translate('Forgot password?'); ?>"
@@ -27,6 +28,45 @@
     </div>
 
     <script type="text/javascript">
+        <?php if ($this->mfaEnabled === true):?>
+            $(document).on('submit', '#login-form', function(e){
+                e.preventDefault();
+                showSpinner('#login-form', 'login-form-spinner system-spinner');
+
+                var email = $(this).find('#email').val(),
+                    password = $(this).find('#password').val(),
+                    secureToken = $(this).find('#secureToken').val();
+
+                $.ajax({
+                    'url': '<?php echo $this->websiteUrl;?>'+'backend/login/index/singintype/member/',
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'data': {
+                        'email':email,
+                        'password':password,
+                        'secureToken':secureToken
+                    }
+                }).done(function(response){
+                    console.log(response);
+                    hideSpinner('.login-form-spinner');
+                    if (parseInt(response.error) === 1) {
+                        if (typeof response.responseText.message !== 'undefined' && response.responseText.message) {
+                            showMessage(response.responseText.message, true, 3000);
+                        }
+
+                        if (typeof response.responseText.redirect !== 'undefined') {
+                            window.location.href = response.responseText.redirect;
+                        }
+                    } else {
+                        showMessage(response.responseText.message, false, 3000);
+                    }
+                }).fail(async function(response){
+                    hideSpinner('.login-form-spinner');
+                });
+
+            });
+        <?php endif;?>
+
         $(function () {
             $(document).on('click', '#remember-password', function () {
                 $('.retrieveFormBlock').hide();
