@@ -79,6 +79,15 @@ class Widgets_Member_Member extends Widgets_Abstract {
         $this->_view->retrieveForm = $passwordRetrieveFrom;
         $this->_session->retrieveRedirect = $this->_toasterOptions['url'];
 
+        $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+        $activateMfa = $configHelper->getConfig('activateMfa');
+        $mfaEnabled = false;
+        if (!empty($activateMfa)){
+            $mfaEnabled = true;
+        }
+
+        $this->_view->mfaEnabled = $mfaEnabled;
+
         unset($this->_session->errMemeberLogin);
 		if(isset($this->_options[0])) {
 			$this->_session->redirectUserTo = $this->_options[0];
