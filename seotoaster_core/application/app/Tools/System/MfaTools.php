@@ -60,6 +60,7 @@ class Tools_System_MfaTools
         $userModel->setMfaCodeExpirationTime(Tools_System_Tools::convertDateFromTimezone('+10 minute', 'UTC', 'UTC'));
         $userMapper->save($userModel);
 
+        $userModel->removeAllObservers();
         $userModel->registerObserver(new Tools_Mail_Watchdog(array(
             'trigger' => Tools_Mail_SystemMailWatchdog::TRIGGER_MFANOTIFICATION,
             'ipAddress' => Tools_System_Tools::getIpAddress()
