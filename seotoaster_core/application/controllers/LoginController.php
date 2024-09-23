@@ -110,7 +110,12 @@ class LoginController extends Zend_Controller_Action {
 
 
                 if(isset($this->_helper->session->redirectUserTo)) {
-                    $this->_redirect($this->_helper->website->getUrl() . $this->_helper->session->redirectUserTo, array('exit' => true));
+                    if ($xmlHttpRequest === true) {
+                        $this->_helper->response->fail(array('redirect' => $this->_helper->website->getUrl() . $this->_helper->session->redirectUserTo));
+                    } else {
+                        $this->_redirect($this->_helper->website->getUrl() . $this->_helper->session->redirectUserTo, array('exit' => true));
+                    }
+
                 }
                 if (isset($this->_helper->session->loginCustomRedirect)) {
                     $customRedirect = $this->_helper->session->loginCustomRedirect;
