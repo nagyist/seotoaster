@@ -97,6 +97,10 @@ class Widgets_Member_Member extends Widgets_Abstract {
             if (empty($errorMessages)) {
                 $errorMessages[] = array('email' => $translator->translate('Verification code was sent to your email.'));
             }
+
+            if (empty($this->_view->messages)) {
+                $this->_view->messages = $errorMessages;
+            }
         }
 
         $this->_view->verificationCodeSection = $verificationCodeSection;

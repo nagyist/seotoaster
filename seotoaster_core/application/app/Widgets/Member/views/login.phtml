@@ -10,15 +10,42 @@
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
-    <?php
-    if ($this->mfaEnabled === true && $this->verificationCodeSection === true) {
-        
-    } else {
-        $this->loginForm->setAction($this->websiteUrl . 'backend/login/index/singintype/member/');
-        $this->loginForm->getElement('secureToken')->setValue($this->secureToken);
-        echo $this->loginForm;
-    }
-    ?>
+    <?php $this->loginForm->setAction($this->websiteUrl . 'backend/login/index/singintype/member/');?>
+    <form id="<?php echo $this->loginForm->getId();?>" enctype="application/x-www-form-urlencoded" action="<?php echo $this->loginForm->getAction();?>">
+        <?php
+        if ($this->mfaEnabled === true && $this->verificationCodeSection === true):?>
+            <p>
+                <label for="login-verification-code"
+                       class="required"><?php echo $this->translate('Enter the verification code'); ?></label>
+                <input id="login-verification-code" type="text" name="login-verification-code" value="">
+            </p>
+            <p>
+                <span><?php echo $this->translate('Didn\'t receive a code?'); ?></span> <a
+                        id="resend-verification-code-link" href="javascript:;"><?php echo $this->translate('Resend'); ?></a>
+            </p>
+        <?php else: ?>
+            <p><?php
+                echo $this->loginForm->getElement('email')->renderLabel();
+                echo $this->loginForm->getElement('email')->renderViewHelper();
+                ?>
+            </p>
+            <p>
+                <?php echo $this->loginForm->getElement('password')->renderLabel(); ?>
+                <?php echo $this->loginForm->getElement('password')->renderViewHelper(); ?>
+            </p>
+            <p class="verification-login-part hidden">
+                <label for="login-verification-code"
+                       class="required"><?php echo $this->translate('Enter the verification code'); ?></label>
+                <input id="login-verification-code" type="text" name="login-verification-code" value="">
+            </p>
+            <p class="verification-login-part hidden">
+                <span><?php echo $this->translate('Didn\'t receive a code?'); ?></span> <a
+                        id="resend-verification-code-link" href="javascript:;"><?php echo $this->translate('Resend'); ?></a>
+            </p>
+        <?php endif; ?>
+        <?php echo $this->loginForm->getElement('submit')->renderViewHelper();?>
+        <input id="secureToken" type="hidden" name="secureToken" value="<?php echo $this->secureToken;?>"/>
+    </form>
     <a href="javascript:;" title="<?php echo $this->translate('Forgot password?'); ?>"
        class="forgot-password"> <?php echo $this->translate('Forgot password?'); ?></a>
     <div class="retrieveFormBlock" style="display: none">
@@ -33,6 +60,8 @@
                 e.preventDefault();
                 showSpinner('#login-form', 'login-form-spinner system-spinner');
 
+                var self = $(this);
+
                 var email = $(this).find('#email').val(),
                     password = $(this).find('#password').val(),
                     secureToken = $(this).find('#secureToken').val();
@@ -44,7 +73,8 @@
                     'data': {
                         'email':email,
                         'password':password,
-                        'secureToken':secureToken
+                        'secureToken':secureToken,
+                        'login-verification-code':$('#login-verification-code').val()
                     }
                 }).done(function(response){
                     console.log(response);
@@ -59,11 +89,38 @@
                         }
                     } else {
                         showMessage(response.responseText.message, false, 3000);
+                        self.find('#email').closest('p').addClass('hidden');
+                        self.find('#password').closest('p').addClass('hidden');
+                        self.find('.verification-login-part').removeClass('hidden');
                     }
                 }).fail(async function(response){
                     hideSpinner('.login-form-spinner');
                 });
 
+            });
+
+            $(document).on('click', '#resend-verification-code-link', function(e){
+                e.preventDefault();
+
+                var secureToken = $(this).closest('form').find('#secureToken').val();
+
+                $.ajax({
+                    url:'<?php echo $this->websiteUrl;?>api/toaster/loginverificationcode/',
+                    type:"POST",
+                    dataType:"json",
+                    data:{
+                        'secureToken':secureToken
+                    }
+                }).done(function(response) {
+                    if (parseInt(response.error) === 0) {
+                        showMessage(response.message, false, 2000);
+                    } else {
+                        showMessage(response.message, true, 3000);
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 3000);
+                    }
+                });
             });
         <?php endif;?>
 
