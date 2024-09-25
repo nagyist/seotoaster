@@ -65,7 +65,7 @@
                 var email = $(this).find('#email').val(),
                     password = $(this).find('#password').val(),
                     secureToken = $(this).find('#secureToken').val(),
-                    loginVerificationCode = $(this).find('#login-verification-code').val(),
+                    loginVerificationCode = $(this).find('#login-verification-code').val();
 
                 $.ajax({
                     'url': '<?php echo $this->websiteUrl;?>'+'backend/login/index/singintype/member/',
