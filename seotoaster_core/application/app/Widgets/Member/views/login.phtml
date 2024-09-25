@@ -64,7 +64,8 @@
 
                 var email = $(this).find('#email').val(),
                     password = $(this).find('#password').val(),
-                    secureToken = $(this).find('#secureToken').val();
+                    secureToken = $(this).find('#secureToken').val(),
+                    loginVerificationCode = $(this).find('#login-verification-code').val(),
 
                 $.ajax({
                     'url': '<?php echo $this->websiteUrl;?>'+'backend/login/index/singintype/member/',
@@ -74,7 +75,7 @@
                         'email':email,
                         'password':password,
                         'secureToken':secureToken,
-                        'login-verification-code':$('#login-verification-code').val()
+                        'login-verification-code':loginVerificationCode
                     }
                 }).done(function(response){
                     hideSpinner('.login-form-spinner');
