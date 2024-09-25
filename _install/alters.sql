@@ -870,6 +870,10 @@ ALTER TABLE `user` ADD `mfa_code` CHAR(6) DEFAULT NULL;
 ALTER TABLE `user` ADD `mfa_code_expiration_time` TIMESTAMP NULL;
 INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES ('1',	't_mfanotification',	'Tools_Mail_SystemMailWatchdog');
 
+-- 25/09/2024
+-- version: 3.8.3
+-- Pre package version
+
 -- These alters are always the latest and updated version of the database
-UPDATE `config` SET `value`='3.8.3' WHERE `name`='version';
+UPDATE `config` SET `value`='3.9.0' WHERE `name`='version';
 SELECT value FROM `config` WHERE name = 'version';
