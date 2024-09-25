@@ -44,7 +44,7 @@ class LoginController extends Zend_Controller_Action {
                     Tools_System_MfaTools::cleanVerificationUserId();
                     if (!isset($this->_helper->session->verificationCodeUserId)) {
                         if ($xmlHttpRequest === true) {
-                            $this->_helper->response->fail(array('message' => $this->_helper->language->translate('Verification code has been expired. Please re-login.')));
+                            $this->_helper->response->fail(array('refresh' => '1', 'message' => $this->_helper->language->translate('Verification code has been expired. Please re-login.')));
                         } else {
                             $this->_checkRedirect(false, array('email' => $this->_helper->language->translate('Verification code has been expired. Please re-login.')));
                         }

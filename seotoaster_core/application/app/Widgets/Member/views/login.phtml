@@ -77,11 +77,15 @@
                         'login-verification-code':$('#login-verification-code').val()
                     }
                 }).done(function(response){
-                    console.log(response);
                     hideSpinner('.login-form-spinner');
                     if (parseInt(response.error) === 1) {
                         if (typeof response.responseText.message !== 'undefined' && response.responseText.message) {
                             showMessage(response.responseText.message, true, 3000);
+                            if (typeof response.responseText.refresh !== 'undefined') {
+                                self.find('#email').closest('p').removeClass('hidden');
+                                self.find('#password').closest('p').removeClass('hidden');
+                                self.find('.verification-login-part').addClass('hidden');
+                            }
                         }
 
                         if (typeof response.responseText.redirect !== 'undefined') {
