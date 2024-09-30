@@ -11,7 +11,7 @@
         </ul>
     <?php endif; ?>
     <?php $this->loginForm->setAction($this->websiteUrl . 'backend/login/index/singintype/member/');?>
-    <form id="<?php echo $this->loginForm->getId();?>" enctype="application/x-www-form-urlencoded" action="<?php echo $this->loginForm->getAction();?>">
+    <form id="<?php echo $this->loginForm->getId();?>" enctype="application/x-www-form-urlencoded" action="<?php echo $this->loginForm->getAction();?>" method="post">
         <?php
         if ($this->mfaEnabled === true && $this->verificationCodeSection === true):?>
             <p>
