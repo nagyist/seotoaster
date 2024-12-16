@@ -200,6 +200,43 @@ $(function() {
 		e.preventDefault();
 		$('#adminselectimgfolder').trigger('change');
 	});
+
+	$(document).on('click', '#generate-ai-content-text', function(e) {
+		var self = this,
+			error = false,
+			errorMessage = '',
+			wordCount = 0,
+			content = tinymce.activeEditor.getContent();
+
+		if (error === true) {
+			showMessage(errorMessage, true, 3000);
+			return false;
+		}
+
+		wordCount = parseInt($(document).find('#ai-content-amount').val());
+
+		showSpinner();
+
+		$.ajax({
+			'url': $('#website_url').val() + 'api/toaster/containersai/',
+			'type':'POST',
+			'dataType':'json',
+			'data': {
+				content:content,
+				wordCount:wordCount,
+				secureToken:$(document).find('#container-secure-token').val()
+			}
+		}).done(function(responseData){
+			hideSpinner();
+			if (parseInt(responseData.error) === 1) {
+				showMessage(responseData.message, true, 3000);
+				return false;
+			}
+
+			tinymce.activeEditor.setContent(responseData.message);
+		});
+
+	});
 });
 
 function dispatchEditorKeyup(editor, event, keyTime) {
