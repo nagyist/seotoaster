@@ -83,13 +83,47 @@ class Api_Toaster_Containersai extends Api_Service_Abstract
 
         $content = $this->getRequest()->getParam('content');
         $wordCount = $this->getRequest()->getParam('wordCount');
+        $pageId = $this->getRequest()->getParam('pageId');
 
-        $info = array(
-            'content' => $content,
-            'wordCount' => $wordCount
-        );
+        if (empty($content) && empty($pageId)) {
+            return array(
+                'error' => '1',
+                'message' => $translator->translate('Please provide some text in container')
+            );
+        }
 
-        $result = Apps::apiCall('POST', 'openaiContent', array(), $info);
+        $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+        $pageModel = $pageMapper->find($pageId);
+        if (!$pageModel instanceof Application_Model_Models_Page) {
+            return array(
+                'error' => '1',
+                'message' => $translator->translate('Please provide some text in container')
+            );
+        }
+
+        $header = $pageModel->getH1();
+        $metaKeywords = $pageModel->getMetaKeywords();
+
+        if (!empty($content)) {
+            $info = array(
+                'wordCount' => $wordCount,
+                'commandType' => 'improve',
+                'params' => array(
+                    'content' => $content
+                )
+            );
+        } else {
+            $info = array(
+                'wordCount' => $wordCount,
+                'commandType' => 'generateContainerContent',
+                'params' => array(
+                    'header' => $header,
+                    'metaKeywords' => $metaKeywords
+                ),
+            );
+        }
+
+        $result = Apps::apiCall('POST', 'openaiTextCompletion', array(), $info);
 
         if (empty($result)) {
             return array(

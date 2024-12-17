@@ -224,6 +224,7 @@ $(function() {
 			'data': {
 				content:content,
 				wordCount:wordCount,
+				pageId:$(document).find('#container-page-id').val(),
 				secureToken:$(document).find('#container-secure-token').val()
 			}
 		}).done(function(responseData){
