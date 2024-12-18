@@ -94,22 +94,25 @@ class Api_Toaster_Containersai extends Api_Service_Abstract
 
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
         $pageModel = $pageMapper->find($pageId);
-        if (!$pageModel instanceof Application_Model_Models_Page) {
+        $header = '';
+        $metaKeywords = '';
+        if (!$pageModel instanceof Application_Model_Models_Page && empty($content)) {
             return array(
                 'error' => '1',
                 'message' => $translator->translate('Please provide some text in container')
             );
+        } elseif ($pageModel instanceof Application_Model_Models_Page && empty($content)) {
+            $header = $pageModel->getH1();
+            $metaKeywords = $pageModel->getMetaKeywords();
         }
 
-        $header = $pageModel->getH1();
-        $metaKeywords = $pageModel->getMetaKeywords();
 
         if (!empty($content)) {
             $info = array(
-                'wordCount' => $wordCount,
                 'commandType' => 'improve',
                 'params' => array(
-                    'content' => $content
+                    'content' => $content,
+                    'wordCount' => $wordCount,
                 )
             );
         } else {
@@ -146,9 +149,7 @@ class Api_Toaster_Containersai extends Api_Service_Abstract
             );
         }
 
-        $data = json_decode($result['data'], true);
-
-        $finalMessage = $data['overview'];
+        $finalMessage = $result['data'];
 
         return array(
             'error' => '0',
