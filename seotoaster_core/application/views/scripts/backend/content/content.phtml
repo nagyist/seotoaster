@@ -27,6 +27,7 @@
                 <?php echo $this->contentForm->getElement('containerName'); ?>
                 <?php echo $this->contentForm->getElement('pageId'); ?>
                 <?php echo $this->contentForm->getElement('containerId'); ?>
+                <input id="container-ai-page-id" type="hidden" value="<?php echo $this->containerAiPageId;?>"/>
                 <input id="container-secure-token" type="hidden" name="secureToken" class="secureToken" value="<?php echo $this->secureToken;?>" />
                 <input id="container-page-id" type="hidden" name="containerPageId" value="<?php echo $this->contentForm->getElement('pageId')->getValue();?>" />
             </form>

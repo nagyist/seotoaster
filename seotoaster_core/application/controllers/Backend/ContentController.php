@@ -221,6 +221,11 @@ class Backend_ContentController extends Zend_Controller_Action {
             if($this->getRequest()->getParam('showMore')){
                 $this->view->showMoreflag = $this->getRequest()->getParam('showMore');
             }
+            $containerAiPageId = (int) $this->getRequest()->getParam('pageId');
+            if (empty($containerAiPageId)) {
+                $containerAiPageId = $this->_contentForm->getElement('pageId')->getValue();
+            }
+            $this->view->containerAiPageId = $containerAiPageId;
             $rendered                       = $this->view->render('backend/content/content.phtml');
 			break;
 			case Application_Model_Models_Container::TYPE_REGULARHEADER:

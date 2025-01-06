@@ -224,7 +224,7 @@ $(function() {
 			'data': {
 				content:content,
 				wordCount:wordCount,
-				pageId:$(document).find('#container-page-id').val(),
+				pageId:$(document).find('#container-ai-page-id').val(),
 				secureToken:$(document).find('#container-secure-token').val()
 			}
 		}).done(function(responseData){
@@ -235,6 +235,7 @@ $(function() {
 			}
 
 			tinymce.activeEditor.setContent(responseData.message);
+			$(document).find('#content').val(responseData.message);
 		});
 
 	});
